@@ -1,6 +1,6 @@
 {
   "name": "What.CD Quick Artist",
-  "version": "1.0",
+  "version": "1.0.1",
   "description": "Quickly select and add artists to the artist list. Especially helpful with VA compilations.",
   "background_page": "background.html",
  "content_scripts": [
