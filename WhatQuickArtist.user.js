@@ -40,3 +40,22 @@ function WhatQuickArtist(strTxt,aType)
 }
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {WhatQuickArtist(request.selectedText,request.addType);});
+
+// Using keycodes is our only choice - http://www.expandinghead.net/keycode.html
+var mKey = 77; //  Ctrl + M
+var gKey = 71; // Ctrl + G
+var rKey = 82; // Ctrl + R
+window.addEventListener('keyup', keyboardNavigation, false); 
+function keyboardNavigation(e) { 
+	switch(e.which) { 
+	case mKey: 
+		if (e.altKey) { if(window.getSelection().toString().length>0){ WhatQuickArtist(window.getSelection(),0); } }
+        break;
+	case gKey:
+		if (e.altKey) { if(window.getSelection().toString().length>0){ WhatQuickArtist(window.getSelection(),1); } }
+	break;
+	case rKey:
+		if (e.altKey) { if(window.getSelection().toString().length>0){ WhatQuickArtist(window.getSelection(),2); } }
+	break; 
+  } 
+} 
