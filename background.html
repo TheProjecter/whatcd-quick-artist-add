@@ -1,9 +1,9 @@
 <script>
 function trim(stringToTrim) { return stringToTrim.replace(/^\s+|\s+$/g,""); }
 
-var addmain = chrome.contextMenus.create({"title": "Add As Main", "contexts":["selection","page"],"onclick": AddMain,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://what.cd/torrents.php?id=*"]});
-var addguest = chrome.contextMenus.create({"title": "Add As Guest", "contexts":["selection","page"],"onclick": AddGuest,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://what.cd/torrents.php?id=*"]});
-var addremixer = chrome.contextMenus.create({"title": "Add As Remixer", "contexts":["selection","page"],"onclick": AddRemixer,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://what.cd/torrents.php?id=*"]});
+var addmain = chrome.contextMenus.create({"title": "Add As Main", "contexts":["selection","page"],"onclick": AddMain,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
+var addguest = chrome.contextMenus.create({"title": "Add As Guest", "contexts":["selection","page"],"onclick": AddGuest,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
+var addremixer = chrome.contextMenus.create({"title": "Add As Remixer", "contexts":["selection","page"],"onclick": AddRemixer,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
 
 function AddMain(info, tab) { AddGeneric(info,tab,0) }
 function AddGuest(info, tab) { AddGeneric(info,tab,1) }
