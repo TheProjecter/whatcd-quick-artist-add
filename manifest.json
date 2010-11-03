@@ -1,6 +1,6 @@
 {
   "name": "What.CD Quick Artist",
-  "version": "1.0.4",
+  "version": "1.1.0",
   "description": "Quickly select and add artists to the artist list. Especially helpful with VA compilations.",
   "update_url":"http://dl.dropbox.com/u/41671/whatcd-quick-artist-add-chrome-updates.xml",
   "options_page": "options.html",
