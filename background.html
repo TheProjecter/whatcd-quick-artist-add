@@ -1,6 +1,18 @@
 <script>
 function trim(stringToTrim) { return stringToTrim.replace(/^\s+|\s+$/g,""); }
-
+	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+		if (request.options == "hotkeys")
+			sendResponse({
+				modM: localStorage.modM, 
+				modG: localStorage.modG,
+				modR: localStorage.modR,
+				intM: localStorage.intM, 
+				intG: localStorage.intG,
+				intR: localStorage.intR
+			});
+		else
+			sendResponse({}); // snub them.
+	});
 var addmain = chrome.contextMenus.create({"title": "Add As Main", "contexts":["selection","page"],"onclick": AddMain,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
 var addguest = chrome.contextMenus.create({"title": "Add As Guest", "contexts":["selection","page"],"onclick": AddGuest,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
 var addremixer = chrome.contextMenus.create({"title": "Add As Remixer", "contexts":["selection","page"],"onclick": AddRemixer,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});

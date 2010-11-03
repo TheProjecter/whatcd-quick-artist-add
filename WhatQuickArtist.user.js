@@ -41,21 +41,121 @@ function WhatQuickArtist(strTxt,aType)
 
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {WhatQuickArtist(request.selectedText,request.addType);});
 
-// Using keycodes is our only choice - http://www.expandinghead.net/keycode.html
-var mKey = 77; //  Ctrl + M
-var gKey = 71; // Ctrl + G
-var rKey = 82; // Ctrl + R
 window.addEventListener('keyup', keyboardNavigation, false); 
 function keyboardNavigation(e) { 
-	switch(e.which) { 
-	case mKey: 
-		if (e.altKey) { if(window.getSelection().toString().length>0){ WhatQuickArtist(window.getSelection(),0); } }
-        break;
-	case gKey:
-		if (e.altKey) { if(window.getSelection().toString().length>0){ WhatQuickArtist(window.getSelection(),1); } }
-	break;
-	case rKey:
-		if (e.altKey) { if(window.getSelection().toString().length>0){ WhatQuickArtist(window.getSelection(),2); } }
-	break; 
-  } 
+
+	chrome.extension.sendRequest({options: "hotkeys"}, function(response) {
+
+		// Keyboard modifier defaults in the event the response fails
+		var mMod = 2;
+		var gMod = 2;
+		var rMod = 2;
+
+		// Using keycodes is our only choice - http://www.expandinghead.net/keycode.html
+
+		// Defaults: In the event the response fails or returns invalid results
+		var mKey = 77; //  Ctrl + M (77)
+		var gKey = 71; // Ctrl + G (71)
+		var rKey = 82; // Ctrl + R (82)
+
+		modM = (response.modM) ? parseInt(response.modM) : mMod;
+		modG = (response.modG) ? parseInt(response.modG) : gMod;
+		modR = (response.modR) ? parseInt(response.modR) : rMod;
+		intM = (response.intM) ? parseInt(response.intM) : mKey;
+		intG = (response.intG) ? parseInt(response.intG) : gKey;
+		intR = (response.intR) ? parseInt(response.intR) : rKey;
+
+		switch(e.which) { 
+		case intM:
+			if(modM==0) {
+				if (e.ctrlKey && !e.altKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),0); 
+					} 
+				}
+			} else if(modM==1) {
+				if (e.altKey && !e.ctrlKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),0); 
+					} 
+				}
+			} else if(modM==2) {
+				if (e.ctrlKey && e.altKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),0); 
+					} 
+				}
+			}
+		break;
+		case intM+32: 
+			if(modM==1) {
+				if (e.altKey && !e.ctrlKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),0); 
+					} 
+				}
+			}
+	     break;
+		case intG:
+			if(modG==0) {
+				if (e.ctrlKey && !e.altKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),1); 
+					} 
+				}
+			} else if(modG==1) {
+				if (e.altKey && !e.ctrlKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),1); 
+					} 
+				}
+			} else if(modG==2) {
+				if (e.ctrlKey && e.altKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),1); 
+					} 
+				}
+			}
+		break;
+		case intG+32: 
+			if(modG==1) {
+				if (e.altKey && !e.ctrlKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),1); 
+					} 
+				}
+			}
+	     break;
+		case intR:
+			if(modR==0) {
+				if (e.ctrlKey && !e.altKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),2); 
+					} 
+				}
+			} else if(modR==1) {
+				if (e.altKey && !e.ctrlKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),2); 
+					} 
+				}
+			} else if(modR==2) {
+				if (e.ctrlKey && e.altKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),2); 
+					} 
+				}
+			}
+		break;
+		case intR+32: 
+			if(modR==1) {
+				if (e.altKey && !e.ctrlKey) {
+					if(window.getSelection().toString().length>0){ 
+						WhatQuickArtist(window.getSelection(),2); 
+					} 
+				}
+			}
+	     break;
+	  	}
+	}); 
 } 
