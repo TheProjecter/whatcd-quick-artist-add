@@ -1,4 +1,8 @@
 <script>
+function fixedEncodeURIComponent (str) {  
+	return encodeURIComponent(str).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A');  
+}
+
 function trim(stringToTrim) { return stringToTrim.replace(/^\s+|\s+$/g,""); }
 	chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		if (request.options == "hotkeys")
@@ -16,11 +20,17 @@ function trim(stringToTrim) { return stringToTrim.replace(/^\s+|\s+$/g,""); }
 var addmain = chrome.contextMenus.create({"title": "Add As Main", "contexts":["selection","page"],"onclick": AddMain,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
 var addguest = chrome.contextMenus.create({"title": "Add As Guest", "contexts":["selection","page"],"onclick": AddGuest,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
 var addremixer = chrome.contextMenus.create({"title": "Add As Remixer", "contexts":["selection","page"],"onclick": AddRemixer,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
+var batchadd = chrome.contextMenus.create({"title": "Batch Add", "contexts":["selection","page"],"onclick": BatchAdd,"documentUrlPatterns":["http://what.cd/torrents.php?id=*","https://ssl.what.cd/torrents.php?id=*"]});
 
 function AddMain(info, tab) { AddGeneric(info,tab,0) }
 function AddGuest(info, tab) { AddGeneric(info,tab,1) }
 function AddRemixer(info, tab) { AddGeneric(info,tab,2) }
-
+function BatchAdd(info, tab) { chrome.tabs.getSelected(null, function(tab) { 
+	args="?txt="+fixedEncodeURIComponent(info.selectionText)+"&tabid="+tab.id;
+	chrome.tabs.create({ 
+		url: chrome.extension.getURL("popup.html")+args
+	}); 
+})};
 
 function AddGeneric(info,tab,aType)
 {

@@ -1,6 +1,5 @@
 <html>
-<head><title>What.CD Quick Artist Add Options</title>
-<style type="text/css">
+<head>
 <style type="text/css">
 /*
 Postmodern: A mongrel stylesheet for What.CD, based on 'Zeal', a modification of the original 'Teal' by pellad.
@@ -1027,135 +1026,105 @@ select:hover, option:hover {
 }
 </style>
 <script type="text/javascript">
+
+function fixedEncodeURIComponent (str) {  
+	return encodeURIComponent(str).replace(/!/g, '%21').replace(/'/g, '%27').replace(/\(/g, '%28').replace(/\)/g, '%29').replace(/\*/g, '%2A');  
+}
+
 function trim(stringToTrim) { return stringToTrim.replace(/^\s+|\s+$/g,""); }
 
-function alphanum(txt)
-{
-	for(var i=0; i<txt.length; i++)
-		{
-		var c = txt.charAt(i);
-		var cc = c.charCodeAt(0);
-		if((cc > 47 && cc<58) || (cc > 64 && cc<91) || (cc > 96 && cc<123)) { }
-		else { return false; }
-	}
-
-	return true;
-}
-
-//a variable that will hold the index number of the selected radio button
-function RadioValue(RadioElement)
-{
-	for (i=0;i<RadioElement.length;i++){
-		if (RadioElement[i].checked==true){
-			return RadioElement[i].value;
+function querySt(ji) {
+	hu = window.location.search.substring(1);
+	gy = hu.split("&");
+	for (i=0;i<gy.length;i++) {
+		ft = gy[i].split("=");
+		if (ft[0] == ji) {
+			return ft[1];
 		}
 	}
-	RadioElement[0].checked=true;
-        return RadioElement[0].value;
 }
-
-//set selected radio button
-function SetRadioValue(RadioElement, index)
+function load()
 {
-	for (i=0;i<RadioElement.length;i++){
-		if (index==i) {
-			RadioElement[i].checked=true;
+	document.batchform.copytext.value = decodeURIComponent(querySt("txt"));
+}
+function textareaToArray(t){
+	return t.value.split(/[\n]+/);
+}
+function removeByIndex(arrayName,arrayIndex){ 
+	arrayName.splice(arrayIndex,1); 
+	return arrayName;
+}
+function updatePreview()
+{
+	a = textareaToArray(document.batchform.copytext);
+	split1 = document.batchform.start.value;
+	split2 = document.batchform.finish.value;
+
+	if(split1!="") {
+		if(split1==" ") {
+			// crop1 = a[0].match(/\w+|"[^"]+"/g);
+			// crop1 = a[0].split(/[\s]+/g);
+			crop1 = a[0].split(/[\s]+/);	
 		} else {
-			RadioElement[i].checked=false;
+			crop1 = a[0].split(split1);	
 		}
+		crop1 = removeByIndex(crop1,0).join(split1);
+	}
+	else {
+		crop1=a[0];
+	}
+	if(split2!="") {
+		crop2 = crop1.split(split2);
+		preview=trim(crop2[0]);
+	} else {
+		preview=trim(crop1);
+	}
+	document.getElementById("preview").innerText=trim(preview);
+}
+function showArray(a,split1,split2){
+	var msg="";
+	var finalval = "";
+	document.batchform.copytext.value="";
+	var crop1;
+	
+	for(var i=0;i<a.length;i++){
+		if(split1!="") {
+			if(split1==" ") {
+				// crop1 = a[i].match(/\w+|"[^"]+"/g);
+				// crop1 = a[i].split(/[\s]+/g);
+				crop1 = a[i].split(/[\s]+/);
+			} else {
+				crop1 = a[i].split(split1);	
+			}
+			crop1 = removeByIndex(crop1,0).join(split1);
+
+		} else {
+			crop1=a[i];
+		}
+		if(split2!="") {
+			crop2 = crop1.split(split2);
+			line = crop2[0];
+		} else {
+			line=crop1;
+		}
+		document.batchform.copytext.value =  document.batchform.copytext.value + trim(line) + '\n';
 	}
 }
+function sendback() {
 
-function process_options() {
-
-	// Capitalize Alpha numeric characters
-	document.getElementById("AlphaKeyMi").value = document.getElementById("AlphaKeyMi").value.toUpperCase();
-	document.getElementById("AlphaKeyGi").value = document.getElementById("AlphaKeyGi").value.toUpperCase();
-	document.getElementById("AlphaKeyRi").value = document.getElementById("AlphaKeyRi").value.toUpperCase();
-
-}
-
-// Saves options to localStorage.
-function save_options() {
-
-	// The Alpha numeric key values
-	alphaM = document.getElementById("AlphaKeyMi");
-	alphaG = document.getElementById("AlphaKeyGi");
-	alphaR = document.getElementById("AlphaKeyRi");
-
-	// Check for blank fields
-	if(trim(alphaM.value).length==0 || trim(alphaM.value).length==0 || trim(alphaM.value).length==0) { 
-		alert("Blank fields are not allowed. Please enter an alpha numeric hotkey.");
-		return false; 
-	}
-
-	// Check for non-alpha numeric characters
-	if(!alphanum(alphaM.value) || !alphanum(alphaG.value) || !alphanum(alphaR.value)) {
-		alert("Only alpha numeric characters are allowed for hotkeys.");
-		return false;
-	}	
-
-	// Get the modifier key (0-Ctrl, 1-Alt, 2-Both)
-	modM = parseInt(RadioValue(document.settings.ActionKeyM));
-	modG = parseInt(RadioValue(document.settings.ActionKeyG));	
-	modR = parseInt(RadioValue(document.settings.ActionKeyR));
-
-	// Alter the keycodes if Alt is selected
-	intM = alphaM.value.charCodeAt(0);
-	intG = alphaG.value.charCodeAt(0);
-	intR = alphaR.value.charCodeAt(0);
-
-	localStorage["modM"]= modM;
-	localStorage["modG"]= modG;
-	localStorage["modR"]= modR;
-	localStorage["intM"]= intM;
-	localStorage["intG"]= intG;
-	localStorage["intR"]= intR;
-
-	// Update status to let user know options were saved.
-	var status = document.getElementById("status");
-	status.innerHTML = "<span style='color:#c00;'>Options Saved. Please reload all What.CD tabs or restart Chrome.&nbsp;</span>";
-	setTimeout(function() {
-		status.innerHTML = "";
-	}, 4000);
-
-	return false;
-}
-
-// Restores select box state to saved value from localStorage.
-function restore_options() {
-
-	if(localStorage["modM"].length==1) {
-		modM = parseInt(localStorage["modM"]);
-		SetRadioValue(document.settings.ActionKeyM, modM);
-	}
-	if(localStorage["modG"].length==1) {
-		modG = parseInt(localStorage["modG"]);
-		SetRadioValue(document.settings.ActionKeyG, modG);
-	}
-	if(localStorage["modR"].length==1) {
-		modR = parseInt(localStorage["modR"]);
-		SetRadioValue(document.settings.ActionKeyR, modR);
-	}
-
-	// The Alpha numeric key values
-	alphaM = document.getElementById("AlphaKeyMi");
-	alphaG = document.getElementById("AlphaKeyGi");
-	alphaR = document.getElementById("AlphaKeyRi");
-
-	intM = localStorage["intM"];
-	intG = localStorage["intG"];
-	intR = localStorage["intR"];
-
-	alphaM.value = (intM) ? String.fromCharCode(intM) : alphaM.value;
-	alphaG.value = (intG) ? String.fromCharCode(intG) : alphaG.value;
-	alphaR.value = (intR) ? String.fromCharCode(intR) : alphaR.value;
-
-	process_options();
+	chrome.tabs.getSelected(null, function(tab) 
+	{ 
+		idtab=parseInt(querySt("tabid"));
+		chrome.tabs.sendRequest(idtab, {method: "fromPopup", tabid: idtab, type: document.batchform.importance.value, contents: fixedEncodeURIComponent(document.batchform.copytext.value), oldtabid: tab.id}, function(response) {
+			window.close();
+		}); 
+	});
+	
 }
 
 </script>
-<body id="better" onload="restore_options()"> 
+</head>
+<body id="better" onload="load();updatePreview()">
 <div id="wrapper"> 
 <h1 class="hidden">What.CD</h1> 
  
@@ -1165,48 +1134,21 @@ function restore_options() {
 </div> 
 <div id="content"> 
 <div class="thin">
-<form name="settings">
-	<h3 id="lists">Hot Key Settings</h3> 
+<form method="post" action="" name="batchform">
+	<h3 id="lists">Track List Splitter</h3> 
 	<div class="box pad" style="padding:10px 10px 10px 20px;"> 
-		<table width="100%"> 
-			<tr class="colhead"> 
-				<td style="width:150px;">Function</td> 
-				<td style="width:400px;">Hot Key Info</td> 
-			</tr> 
-			<tr class="rowb" valign="top"> 
-				<td class="nobr"> 
-					Add Artist as Main
-				</td> 
-				<td class="nobr"> 
-					Modifier Key: &nbsp;&nbsp;<input type="radio" name="ActionKeyM" value="0" id="ActionKeyMi0" /><label for="ActionKeyMi0">Ctrl</label>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="ActionKeyM" value="1" id="ActionKeyMi1" /><label for="ActionKeyMi1">Alt</label>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="ActionKeyM" value="2" id="ActionKeyMi2" checked="checked" /><label for="ActionKeyMi2">Ctrl+Alt</label>
-<br>
-					Alpha Numeric Key: <input type="text" name="AlphaKeyM" id="AlphaKeyMi" size="1" maxlength="1" value="M">
-				</td> 
-			</tr> 
-			<tr class="rowb" valign="top"> 
-				<td class="nobr"> 
-					Add Artist as Guest
-				</td> 
-				<td class="nobr"> 
-					Modifier Key: &nbsp;&nbsp;<input type="radio" name="ActionKeyG" value="0" id="ActionKeyGi0" /><label for="ActionKeyGi0">Ctrl</label>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="ActionKeyG" value="1" id="ActionKeyGi1" /><label for="ActionKeyGi1">Alt</label>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="ActionKeyG" value="2" id="ActionKeyGi2" checked="checked" /><label for="ActionKeyGi2">Ctrl+Alt</label>
-				<br> 
-					Alpha Numeric Key: <input type="text" name="AlphaKeyG" id="AlphaKeyGi" size="1" maxlength="1" value="G">
-				</td> 
-			</tr> 
-			<tr class="rowb" valign="top"> 
-				<td class="nobr"> 
-					Add Artist as Remixer
-				</td> 
-				<td class="nobr"> 
-					Modifier Key: &nbsp;&nbsp;<input type="radio" name="ActionKeyR" value="0" id="ActionKeyRi0" /><label for="ActionKeyRi0">Ctrl</label>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="ActionKeyR" value="1" id="ActionKeyRi1" /><label for="ActionKeyRi1">Alt</label>&nbsp;&nbsp;&nbsp;&nbsp;<input type="radio" name="ActionKeyR" value="2" id="ActionKeyRi2" checked="checked" /><label for="ActionKeyRi2">Ctrl+Alt</label>
-				<br>Alpha Numeric Key: <input type="text" name="AlphaKeyR" id="AlphaKeyRi" size="1" maxlength="1" value="R">
-				</td> 
-			</tr> 
-		</table> 
-	</div> 
-	<h3 id="general">Save Settings</h3> 
-	<div class="box pad" style="padding:10px 10px 10px 20px;"> 
-		<p style="text-align:right;"><span id="status"></span><input type="submit" onclick="process_options();save_options();return false;" value="Save Settings" name="sub" /><br></p> 
+		Keep characters between: <input type="text" name="start" value="." onchange="updatePreview();" onkeyup="updatePreview();"> 
+		And: <input type="text" name="finish" value="-" onchange="updatePreview();" onkeyup="updatePreview();"> 
+		<hr>Preview: <span id="preview">&nbsp;</span><br/><hr><br>
+		<textarea name="copytext" style="height:400px;width:800px;" id="copytexti" onkeyup="updatePreview();" onmouseup="updatePreview();"> </textarea><br><input type="submit" value="Perform Split" onclick="showArray(textareaToArray(this.form.copytext),this.form.start.value,this.form.finish.value);return false" /><br />
+	</div>
+	<h3 id="lists">Add Artists</h3>
+	<div class="box pad" style="padding:10px 10px 10px 20px;">
+		<input type="submit" value="Send Artists" onclick="sendback();return false;" /> as <select name="importance"> 
+							<option value="0">Main</option> 
+							<option value="1">Guest</option> 
+							<option value="2">Remixer</option> 
+						</select>  OR <input type="submit" value="Clear Form" onclick="var answer = confirm ('Are you sure you want to clear this form?');if(answer){this.form.reset();}return false;" />
 	</div>
 </form>
 </div> 
@@ -1214,5 +1156,5 @@ function restore_options() {
 <div id="footer"> 
 	<p>What.CD Quick Artist</p> 
 </div>
-</body> 
+</body>
 </html>

@@ -1,5 +1,9 @@
 function trim(stringToTrim) { return stringToTrim.replace(/^\s+|\s+$/g,""); }
 
+function multilineToArray(t){
+	return t.split(/[\n]+/);
+}
+
 // Taken from what.cd's browse.js (Line 192)
 function AddArtistField() {
 	var ArtistFieldCount = document.getElementById("AddArtists").getElementsByTagName("input").length;
@@ -39,7 +43,30 @@ function WhatQuickArtist(strTxt,aType)
 	}
 }
 
-chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {WhatQuickArtist(request.selectedText,request.addType);});
+
+chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
+
+	if (request.method == "fromPopup") {
+		// Send JSON data back to Popup.
+		focus();
+		contents = decodeURIComponent(request.contents);
+		contents=multilineToArray(contents);
+		for(var i=0;i<contents.length;i++) 
+		{
+			WhatQuickArtist(contents[i],parseInt(request.type));
+		}
+		
+		sendResponse({data: "from Content Script to Popup"});
+
+		// Send JSON data to background page.
+		// chrome.extension.sendRequest({method: "fromContentScript"}, function(response) {
+		//	console.log(response.data);
+		// });
+	} else {
+		WhatQuickArtist(request.selectedText,request.addType);
+	}
+
+});
 
 window.addEventListener('keyup', keyboardNavigation, false); 
 function keyboardNavigation(e) { 
