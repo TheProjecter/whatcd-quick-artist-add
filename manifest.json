@@ -12,7 +12,7 @@
   
  "content_scripts": [
     {
-      "matches": ["http://what.cd/torrents.php*","https://ssl.what.cd/torrents.php*"],
+      "matches": ["http://what.cd/torrents.php*","https://ssl.what.cd/torrents.php*","https://what.cd/torrents.php*"],
       "js": ["WhatQuickArtist.user.js"]
     }
   ],
