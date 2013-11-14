@@ -12,12 +12,12 @@ function AddArtistField() {
 	var ArtistField = document.createElement("input");
 	ArtistField.type = "text";
 	ArtistField.name = "aliasname[]";
-	ArtistField.size = "20";
+	ArtistField.size = "17";
 	x.appendChild(ArtistField);
 	x.appendChild(document.createTextNode(' '));
 	var Importance = document.createElement("select");
 	Importance.name = "importance[]";
-	Importance.innerHTML = '<option value="1">Main</option><option value="2">Guest</option><option value="3">Remixer</option>';
+	Importance.innerHTML = '<option value="1">Main</option><option value="2">Guest</option><option value="4">Composer</option><option value="5">Conductor</option><option value="6">DJ / Compiler</option><option value="3">Remixer</option><option value="7">Producer</option>';
 	x.appendChild(Importance);
 	ArtistFieldCount++; 
 }
@@ -30,25 +30,35 @@ function WhatQuickArtist(strTxt,aType)
 		var diff = a.length - j;
 		if(trim(a[i].value).length<1 && a[i].name=="aliasname[]") {
 			a[i].value=strTxt;
-			as[i-diff][aType].selected="selected";
+			setDropdownByValue(as[i-diff],aType);
 			i=a.length+1;
 		}
 		if(i==a.length-1)
 		{
 			AddArtistField();
 			a[i+1].value=strTxt;
-			as[i-diff+1][aType].selected="selected";
+			setDropdownByValue(as[i-diff+1],aType);
 			i=a.length+1;
 		}	
 	}
 }
 
+function setDropdownByValue(e,v) {
+	for(var i=0; i<e.options.length; i++) {
+	  if ( e.options[i].value == v ) {
+	    e.selectedIndex = i;
+	    
+	    break;
+	  }
+	}
+}
 
+/* Process any incoming requests */
 chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 
 	if (request.method == "fromPopup") {
 		// Send JSON data back to Popup.
-		focus();
+		window.focus();
 		contents = decodeURIComponent(request.contents);
 		contents=multilineToArray(contents);
 		for(var i=0;i<contents.length;i++) 
@@ -62,12 +72,35 @@ chrome.extension.onRequest.addListener(function(request, sender, sendResponse) {
 		// chrome.extension.sendRequest({method: "fromContentScript"}, function(response) {
 		//	console.log(response.data);
 		// });
+	} else if (request.method == "requestSelection") {
+
+		// http://groups.google.com/group/mozilla.dev.tech.dom/browse_thread/thread/7ecbbb066ff2027f
+		// Martin Honnen
+		//  http://JavaScript.FAQTs.com
+		 var selection = window.getSelection();
+		 var range = selection.getRangeAt(0);
+		 if (range) {
+		 	var div = document.createElement('div');
+		 	div.appendChild(range.cloneContents());
+		 	sel=div.textContent;
+		 }
+
+		sendResponse({
+			'reply':'selectionCaptured',
+			'selectedtabid': request.selectedtabid,
+			'popuptabid': request.popuptabid,
+			'selectiontext': sel, 
+		});
+		 
+
 	} else {
 		WhatQuickArtist(request.selectedText,request.addType);
 	}
 
 });
 
+
+/* Listener for keyup event */
 window.addEventListener('keyup', keyboardNavigation, false); 
 function keyboardNavigation(e) { 
 
@@ -97,19 +130,19 @@ function keyboardNavigation(e) {
 			if(modM==0) {
 				if (e.ctrlKey && !e.altKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),0); 
+						WhatQuickArtist(window.getSelection(),1); 
 					} 
 				}
 			} else if(modM==1) {
 				if (e.altKey && !e.ctrlKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),0); 
+						WhatQuickArtist(window.getSelection(),1); 
 					} 
 				}
 			} else if(modM==2) {
 				if (e.ctrlKey && e.altKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),0); 
+						WhatQuickArtist(window.getSelection(),1); 
 					} 
 				}
 			}
@@ -118,7 +151,7 @@ function keyboardNavigation(e) {
 			if(modM==1) {
 				if (e.altKey && !e.ctrlKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),0); 
+						WhatQuickArtist(window.getSelection(),1); 
 					} 
 				}
 			}
@@ -127,19 +160,19 @@ function keyboardNavigation(e) {
 			if(modG==0) {
 				if (e.ctrlKey && !e.altKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),1); 
+						WhatQuickArtist(window.getSelection(),2); 
 					} 
 				}
 			} else if(modG==1) {
 				if (e.altKey && !e.ctrlKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),1); 
+						WhatQuickArtist(window.getSelection(),2); 
 					} 
 				}
 			} else if(modG==2) {
 				if (e.ctrlKey && e.altKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),1); 
+						WhatQuickArtist(window.getSelection(),2); 
 					} 
 				}
 			}
@@ -148,7 +181,7 @@ function keyboardNavigation(e) {
 			if(modG==1) {
 				if (e.altKey && !e.ctrlKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),1); 
+						WhatQuickArtist(window.getSelection(),2); 
 					} 
 				}
 			}
@@ -157,19 +190,19 @@ function keyboardNavigation(e) {
 			if(modR==0) {
 				if (e.ctrlKey && !e.altKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),2); 
+						WhatQuickArtist(window.getSelection(),3); 
 					} 
 				}
 			} else if(modR==1) {
 				if (e.altKey && !e.ctrlKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),2); 
+						WhatQuickArtist(window.getSelection(),3); 
 					} 
 				}
 			} else if(modR==2) {
 				if (e.ctrlKey && e.altKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),2); 
+						WhatQuickArtist(window.getSelection(),3); 
 					} 
 				}
 			}
@@ -178,7 +211,7 @@ function keyboardNavigation(e) {
 			if(modR==1) {
 				if (e.altKey && !e.ctrlKey) {
 					if(window.getSelection().toString().length>0){ 
-						WhatQuickArtist(window.getSelection(),2); 
+						WhatQuickArtist(window.getSelection(),3); 
 					} 
 				}
 			}
